@@ -5,14 +5,15 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Runtime.CompilerServices;
-///█ ■
-////https://www.youtube.com/watch?v=SGZgvMwjq2U
+using static System.Runtime.InteropServices.JavaScript.JSType;
+
 namespace Snake
 {
     class Program
     {
         const int screenHeight = 16;
         const int screenWidth = 32;
+        const char drawingBlock = '■';
         Random randomNum;
 
         private int score;
@@ -21,6 +22,9 @@ namespace Snake
         private string movement;
         List<int> bodyXPos;
         List<int> bodyYPos;
+        int berryX;
+        int berryY;
+        
 
         static void Main(string[] args)
         {
@@ -30,50 +34,30 @@ namespace Snake
         {
             SetupWindow();
             Init();
-            //var randomNum = new Random();
-
-            var berryX = randomNum.Next(0, screenWidth);
-            var berryY = randomNum.Next(0, screenHeight);
 
             while (!gameOver)
             {
                 Console.Clear();
                 DrawBorders(screenWidth, screenHeight);
+                CheckGameOver();
 
-                if (head.XPos == screenWidth - 1 || head.XPos == 0 || head.YPos == screenHeight - 1 || head.YPos == 0)
-                {
-                    gameOver = true;
-                }
-
-                Console.ForegroundColor = ConsoleColor.Green;
                 if (berryX == head.XPos && berryY == head.YPos)
                 {
                     score++;
-                    berryX = randomNum.Next(1, screenWidth - 2);
-                    berryY = randomNum.Next(1, screenHeight - 2);
+                    GenerateBerry();
                 }
 
                 for (var i = 0; i < bodyXPos.Count; i++)
                 {
-                    Console.SetCursorPosition(bodyXPos[i], bodyYPos[i]);
-                    Console.Write("■");
-                    if (bodyXPos[i] == head.XPos && bodyYPos[i] == head.YPos)
-                    {
-                        gameOver = true;
-                    }
+                    DrawPixelInConsole(bodyXPos[i], bodyYPos[i], ConsoleColor.Green);
                 }
 
                 if (gameOver)
                 {
                     break;
                 }
-
-                Console.SetCursorPosition(head.XPos, head.YPos);
-                Console.ForegroundColor = head.ScreenColor;
-                Console.Write("■");
-                Console.SetCursorPosition(berryX, berryY);
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.Write("■");
+                DrawPixelInConsole(head.XPos, head.YPos, head.ScreenColor);
+                DrawPixelInConsole(berryX, berryY, ConsoleColor.Cyan);
 
                 var time = DateTime.Now;
                 var buttonPressed = false;
@@ -106,16 +90,18 @@ namespace Snake
                         }
                     }
                 }
-
                 UpdateSnakePosition(ref head, ref bodyXPos, ref bodyYPos, movement, score);
             }
+            GameOverScreen();
+        }
 
+        private void GameOverScreen()
+        {
+            Console.Clear();
             Console.SetCursorPosition(screenWidth / 5, screenHeight / 2);
             Console.WriteLine("Game over, Score: " + score);
             Console.SetCursorPosition(screenWidth / 5, screenHeight / 2 + 1);
             Console.ReadLine(); // Keep the console window open
-
-
         }
         private void SetupWindow()
         {
@@ -138,26 +124,36 @@ namespace Snake
             movement = "RIGHT";
             bodyXPos = new List<int>();
             bodyYPos = new List<int>();
+            GenerateBerry();
         }
+
+        private void GenerateBerry()
+        {
+            berryX = randomNum.Next(1, screenWidth - 2);
+            berryY = randomNum.Next(1, screenHeight - 2);
+        }
+
 
         private void DrawBorders(int width, int height)
         {
-            Console.ForegroundColor = ConsoleColor.White;
             for (var i = 0; i < width; i++)
             {
-                Console.SetCursorPosition(i, 0);
-                Console.Write("■");
-                Console.SetCursorPosition(i, height - 1);
-                Console.Write("■");
+                DrawPixelInConsole(i, 0, ConsoleColor.White);
+                DrawPixelInConsole(i, height - 1, ConsoleColor.White);
             }
 
             for (var i = 0; i < height; i++)
             {
-                Console.SetCursorPosition(0, i);
-                Console.Write("■");
-                Console.SetCursorPosition(width - 1, i);
-                Console.Write("■");
+                DrawPixelInConsole(0, i , ConsoleColor.White);
+                DrawPixelInConsole(width - 1, i, ConsoleColor.White);
             }
+        }
+
+        private void DrawPixelInConsole(int xPos, int yPos, ConsoleColor pixelColor)
+        {
+            Console.SetCursorPosition(xPos, yPos);
+            Console.ForegroundColor = pixelColor;
+            Console.Write(drawingBlock);
         }
 
         private void UpdateSnakePosition(ref Pixel head, ref List<int> bodyXPos, ref List<int> bodyYPos, string movement, int score)
@@ -187,7 +183,24 @@ namespace Snake
             bodyXPos.RemoveAt(0);
             bodyYPos.RemoveAt(0);
         }
-
+        private void CheckGameOver()
+        {
+            // Snake crash into wall
+            if (head.XPos == screenWidth - 1 || head.XPos == 0 || head.YPos == screenHeight - 1 || head.YPos == 0)
+            {
+                gameOver = true;
+                return;
+            }
+            // Snake crash into himself
+            for (var i = 0; i < bodyXPos.Count; i++)
+            {
+                if (bodyXPos[i] == head.XPos && bodyYPos[i] == head.YPos)
+                {
+                    gameOver = true;
+                    return;
+                }
+            }
+        }
         private class Pixel
         {
             public int XPos { get; set; }
