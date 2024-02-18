@@ -4,35 +4,34 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Runtime.CompilerServices;
 ///█ ■
 ////https://www.youtube.com/watch?v=SGZgvMwjq2U
 namespace Snake
 {
     class Program
     {
+        const int screenHeight = 16;
+        const int screenWidth = 32;
+        Random randomNum;
+
+        private int score;
+        private bool gameOver;
+        private Pixel head;
+        private string movement;
+        List<int> bodyXPos;
+        List<int> bodyYPos;
+
         static void Main(string[] args)
         {
             new Program().Run();
         }
-        private void Run() { 
-            Console.WindowHeight = 16;
-            Console.WindowWidth = 32;
+        private void Run()
+        {
+            SetupWindow();
+            Init();
+            //var randomNum = new Random();
 
-            var screenWidth = Console.WindowWidth;
-            var screenHeight = Console.WindowHeight;
-            var randomNum = new Random();
-            var score = 5;
-            var gameOver = false;
-            var head = new Pixel
-            {
-                XPos = screenWidth / 2,
-                YPos = screenHeight / 2,
-                ScreenColor = ConsoleColor.Red
-            };
-
-            var movement = "RIGHT";
-            var bodyXPos = new List<int>();
-            var bodyYPos = new List<int>();
             var berryX = randomNum.Next(0, screenWidth);
             var berryY = randomNum.Next(0, screenHeight);
 
@@ -115,6 +114,30 @@ namespace Snake
             Console.WriteLine("Game over, Score: " + score);
             Console.SetCursorPosition(screenWidth / 5, screenHeight / 2 + 1);
             Console.ReadLine(); // Keep the console window open
+
+
+        }
+        private void SetupWindow()
+        {
+            Console.WindowHeight = screenHeight;
+            Console.WindowWidth = screenWidth;
+        }
+
+        private void Init()
+        {
+            randomNum = new Random();
+            score = 5;
+            gameOver = false;
+            head = new Pixel
+            {
+                XPos = screenWidth / 2,
+                YPos = screenHeight / 2,
+                ScreenColor = ConsoleColor.Red
+            };
+
+            movement = "RIGHT";
+            bodyXPos = new List<int>();
+            bodyYPos = new List<int>();
         }
 
         private void DrawBorders(int width, int height)
