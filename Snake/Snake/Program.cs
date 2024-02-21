@@ -19,7 +19,7 @@ namespace Snake
         private int score;
         private bool gameOver;
         private Pixel head;
-        private string movement;
+        private Direction movement;
         List<int> bodyXPos;
         List<int> bodyYPos;
         int berryX;
@@ -71,20 +71,20 @@ namespace Snake
 
                         switch (key.Key)
                         {
-                            case ConsoleKey.UpArrow when movement != "DOWN":
-                                movement = "UP";
+                            case ConsoleKey.UpArrow when movement != Direction.Down:
+                                movement = Direction.Up;
                                 buttonPressed = true;
                                 break;
-                            case ConsoleKey.DownArrow when movement != "UP":
-                                movement = "DOWN";
+                            case ConsoleKey.DownArrow when movement != Direction.Up:
+                                movement = Direction.Down;
                                 buttonPressed = true;
                                 break;
-                            case ConsoleKey.LeftArrow when movement != "RIGHT":
-                                movement = "LEFT";
+                            case ConsoleKey.LeftArrow when movement != Direction.Right:
+                                movement = Direction.Left;
                                 buttonPressed = true;
                                 break;
-                            case ConsoleKey.RightArrow when movement != "LEFT":
-                                movement = "RIGHT";
+                            case ConsoleKey.RightArrow when movement != Direction.Left:
+                                movement = Direction.Right;
                                 buttonPressed = true;
                                 break;
                         }
@@ -121,7 +121,7 @@ namespace Snake
                 ScreenColor = ConsoleColor.Red
             };
 
-            movement = "RIGHT";
+            movement = Direction.Right;
             bodyXPos = new List<int>();
             bodyYPos = new List<int>();
             GenerateBerry();
@@ -156,23 +156,23 @@ namespace Snake
             Console.Write(drawingBlock);
         }
 
-        private void UpdateSnakePosition(ref Pixel head, ref List<int> bodyXPos, ref List<int> bodyYPos, string movement, int score)
+        private void UpdateSnakePosition(ref Pixel head, ref List<int> bodyXPos, ref List<int> bodyYPos, Direction movement, int score)
         {
             bodyXPos.Add(head.XPos);
             bodyYPos.Add(head.YPos);
 
             switch (movement)
             {
-                case "UP":
+                case Direction.Up:
                     head.YPos--;
                     break;
-                case "DOWN":
+                case Direction.Down:
                     head.YPos++;
                     break;
-                case "LEFT":
+                case Direction.Left:
                     head.XPos--;
                     break;
-                case "RIGHT":
+                case Direction.Right:
                     head.XPos++;
                     break;
             }
@@ -206,6 +206,13 @@ namespace Snake
             public int XPos { get; set; }
             public int YPos { get; set; }
             public ConsoleColor ScreenColor { get; init; }
+        }
+        private enum Direction
+        {
+            Left,
+            Right,
+            Up,
+            Down
         }
     }
 }
