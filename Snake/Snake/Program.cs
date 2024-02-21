@@ -37,9 +37,7 @@ namespace Snake
 
             while (!gameOver)
             {
-                Console.Clear();
-                DrawBorders(screenWidth, screenHeight);
-                CheckGameOver();
+                
 
                 if (berryX == head.XPos && berryY == head.YPos)
                 {
@@ -47,24 +45,19 @@ namespace Snake
                     GenerateBerry();
                 }
 
-                for (var i = 0; i < bodyXPos.Count; i++)
-                {
-                    DrawPixelInConsole(bodyXPos[i], bodyYPos[i], ConsoleColor.Green);
-                }
 
-                if (gameOver)
-                {
-                    break;
-                }
                 DrawPixelInConsole(head.XPos, head.YPos, head.ScreenColor);
-                DrawPixelInConsole(berryX, berryY, ConsoleColor.Cyan);
+                if (bodyYPos.Count > 0)
+                    DrawPixelInConsole(bodyXPos[bodyXPos.Count - 1], bodyYPos[bodyYPos.Count - 1], ConsoleColor.Green);
+
+                
 
                 var time = DateTime.Now;
                 var buttonPressed = false;
 
                 while (true)
                 {
-                    if (DateTime.Now.Subtract(time).TotalMilliseconds > 500) { break; }
+                    if (DateTime.Now.Subtract(time).TotalMilliseconds > 800) { break; }
                     if (Console.KeyAvailable && !buttonPressed)
                     {
                         var key = Console.ReadKey(true);
@@ -91,6 +84,7 @@ namespace Snake
                     }
                 }
                 UpdateSnakePosition(ref head, ref bodyXPos, ref bodyYPos, movement, score);
+                CheckGameOver();
             }
             GameOverScreen();
         }
@@ -125,12 +119,14 @@ namespace Snake
             bodyXPos = new List<int>();
             bodyYPos = new List<int>();
             GenerateBerry();
+            DrawBorders(screenWidth, screenHeight);
         }
 
         private void GenerateBerry()
         {
             berryX = randomNum.Next(1, screenWidth - 2);
             berryY = randomNum.Next(1, screenHeight - 2);
+            DrawPixelInConsole(berryX, berryY, ConsoleColor.Cyan);
         }
 
 
@@ -179,7 +175,8 @@ namespace Snake
 
             if (bodyXPos.Count <= score)
                 return;
-
+            Console.SetCursorPosition(bodyXPos[0], bodyYPos[0]);
+            Console.Write(" ");
             bodyXPos.RemoveAt(0);
             bodyYPos.RemoveAt(0);
         }
